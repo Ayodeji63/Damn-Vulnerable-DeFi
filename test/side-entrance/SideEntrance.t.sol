@@ -4,6 +4,7 @@ pragma solidity =0.8.25;
 
 import {Test, console} from "forge-std/Test.sol";
 import {SideEntranceLenderPool} from "../../src/side-entrance/SideEntranceLenderPool.sol";
+import {Attacker} from "../../src/side-entrance/Attacker.sol";
 
 contract SideEntranceChallenge is Test {
     address deployer = makeAddr("deployer");
@@ -14,6 +15,7 @@ contract SideEntranceChallenge is Test {
     uint256 constant PLAYER_INITIAL_ETH_BALANCE = 1e18;
 
     SideEntranceLenderPool pool;
+    Attacker attacker;
 
     modifier checkSolvedByPlayer() {
         vm.startPrank(player, player);
@@ -28,6 +30,7 @@ contract SideEntranceChallenge is Test {
     function setUp() public {
         startHoax(deployer);
         pool = new SideEntranceLenderPool();
+        attacker = new Attacker(address(pool));
         pool.deposit{value: ETHER_IN_POOL}();
         vm.deal(player, PLAYER_INITIAL_ETH_BALANCE);
         vm.stopPrank();
@@ -45,7 +48,8 @@ contract SideEntranceChallenge is Test {
      * CODE YOUR SOLUTION HERE
      */
     function test_sideEntrance() public checkSolvedByPlayer {
-        
+        attacker.flashLoan();
+        attacker.withdraw(address(recovery));
     }
 
     /**
